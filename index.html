@@ -161,6 +161,10 @@ searchBox.addEventListener('input', () => {
 
 // แสดงคำศัพท์ทั้งหมดเมื่อโหลดหน้า
 displayWords(preparedDictionary);
+          document.addEventListener('copy', (event) => {
+            event.preventDefault();
+            alert('การคัดลอกถูกปิดใช้งานในหน้านี้');
+        });
     </script>
 </body>
 </html>
