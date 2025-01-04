@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Japanese Dictionary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            margin-top: 40px;
+            max-width: 800px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .search-box {
+            position: relative;
+        }
+        #searchBox {
+            width: 100%;
+            padding: 10px 40px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            outline: none;
+            transition: box-shadow 0.3s;
+        }
+        #searchBox:focus {
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #aaa;
+        }
+        table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+        th {
+            background-color: #007BFF;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        .no-results {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center text-primary">Japanese Dictionary by ピーセック先生</h1>
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchBox" placeholder="ค้นหาได้ภาษาไทย, 漢字, ひらがな, romaji" />
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Thai</th>
+                    <th style="width: 25%;">Kanji</th>
+                    <th style="width: 25%;">Hiragana</th>
+                    <th style="width: 25%;">Romaji</th>
+                </tr>
+            </thead>
+            <tbody id="dictionaryTable">
+                <!-- คำศัพท์จะถูกแสดงที่นี่ -->
+            </tbody>
+        </table>
+        <p id="noResults" class="no-results d-none">ไม่มีคำศัพท์ที่ค้นหา</p>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="dictionary.js"></script>
+    <script>
+        const searchBox = document.getElementById('searchBox');
+        const dictionaryTable = document.getElementById('dictionaryTable');
+        const noResults = document.getElementById('noResults');
+
+        // ฟังก์ชันสำหรับแสดงคำศัพท์ในตาราง
+        function displayWords(words) {
+            dictionaryTable.innerHTML = ''; // ล้างเนื้อหาเก่าในตาราง
+            if (words.length > 0) {
+                noResults.classList.add('d-none'); // ซ่อนข้อความ "ไม่มีคำศัพท์"
+                words.forEach(word => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${word.thai || '-'}</td>
+                        <td>${word.kanji || '-'}</td>
+                        <td>${word.hiragana || '-'}</td>
+                        <td>${word.romaji || '-'}</td>
+                    `;
+                    dictionaryTable.appendChild(row);
+                });
+            } else {
+                // แสดงข้อความเมื่อไม่มีผลลัพธ์
+                noResults.classList.remove('d-none');
+            }
+        }
+
+        // ฟังก์ชันสำหรับค้นหาคำศัพท์
+        function searchWords(query) {
+            const lowerCaseQuery = query.toLowerCase();
+            return dictionary.filter(word => {
+                return (
+                    (word.thai && word.thai.includes(query)) ||
+                    (word.kanji && word.kanji.includes(query)) ||
+                    (word.hiragana && word.hiragana.includes(query)) ||
+                    (word.romaji && word.romaji.toLowerCase().includes(lowerCaseQuery))
+                );
+            });
+        }
+
+        // อีเวนต์เมื่อผู้ใช้พิมพ์ในช่องค้นหา
+        searchBox.addEventListener('input', () => {
+            const query = searchBox.value.trim();
+            const results = searchWords(query);
+            displayWords(results);
+        });
+
+        // แสดงคำศัพท์ทั้งหมดเมื่อโหลดหน้า
+        if (typeof dictionary !== 'undefined' && Array.isArray(dictionary)) {
+            displayWords(dictionary);
+        } else {
+            console.error('Dictionary data is not loaded or invalid.');
+        }
+    </script>
+</body>
+</html>
