@@ -101,57 +101,66 @@
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="dictionary.js"></script>
     <script>
-        const searchBox = document.getElementById('searchBox');
-        const dictionaryTable = document.getElementById('dictionaryTable');
-        const noResults = document.getElementById('noResults');
+         const searchBox = document.getElementById('searchBox');
+const dictionaryTable = document.getElementById('dictionaryTable');
+const noResults = document.getElementById('noResults');
 
-        // ฟังก์ชันสำหรับแสดงคำศัพท์ในตาราง
-        function displayWords(words) {
-            dictionaryTable.innerHTML = ''; // ล้างเนื้อหาเก่าในตาราง
-            if (words.length > 0) {
-                noResults.classList.add('d-none'); // ซ่อนข้อความ "ไม่มีคำศัพท์"
-                words.forEach(word => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${word.thai || '-'}</td>
-                        <td>${word.kanji || '-'}</td>
-                        <td>${word.hiragana || '-'}</td>
-                        <td>${word.romaji || '-'}</td>
-                    `;
-                    dictionaryTable.appendChild(row);
-                });
-            } else {
-                // แสดงข้อความเมื่อไม่มีผลลัพธ์
-                noResults.classList.remove('d-none');
-            }
-        }
+// เตรียมข้อมูลล่วงหน้า
+const preparedDictionary = dictionary.map(word => ({
+    thai: word.thai || '',
+    kanji: word.kanji || '',
+    hiragana: word.hiragana || '',
+    romaji: word.romaji || '',
+    thaiLower: (word.thai || '').toLowerCase(),
+    kanjiLower: (word.kanji || '').toLowerCase(),
+    hiraganaLower: (word.hiragana || '').toLowerCase(),
+    romajiLower: (word.romaji || '').toLowerCase()
+}));
 
-        // ฟังก์ชันสำหรับค้นหาคำศัพท์
-        function searchWords(query) {
-            const lowerCaseQuery = query.toLowerCase();
-            return dictionary.filter(word => {
-                return (
-                    (word.thai && word.thai.includes(query)) ||
-                    (word.kanji && word.kanji.includes(query)) ||
-                    (word.hiragana && word.hiragana.includes(query)) ||
-                    (word.romaji && word.romaji.toLowerCase().includes(lowerCaseQuery))
-                );
-            });
-        }
-
-        // อีเวนต์เมื่อผู้ใช้พิมพ์ในช่องค้นหา
-        searchBox.addEventListener('input', () => {
-            const query = searchBox.value.trim();
-            const results = searchWords(query);
-            displayWords(results);
+function displayWords(words) {
+    dictionaryTable.innerHTML = '';
+    if (words.length > 0) {
+        noResults.classList.add('d-none');
+        words.forEach(word => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${word.thai}</td>
+                <td>${word.kanji}</td>
+                <td>${word.hiragana}</td>
+                <td>${word.romaji}</td>
+            `;
+            dictionaryTable.appendChild(row);
         });
+    } else {
+        noResults.classList.remove('d-none');
+    }
+}
 
-        // แสดงคำศัพท์ทั้งหมดเมื่อโหลดหน้า
-        if (typeof dictionary !== 'undefined' && Array.isArray(dictionary)) {
-            displayWords(dictionary);
-        } else {
-            console.error('Dictionary data is not loaded or invalid.');
-        }
+function searchWords(query) {
+    const lowerCaseQuery = query.toLowerCase();
+    return preparedDictionary.filter(word => {
+        return (
+            word.thaiLower.includes(lowerCaseQuery) ||
+            word.kanjiLower.includes(lowerCaseQuery) ||
+            word.hiraganaLower.includes(lowerCaseQuery) ||
+            word.romajiLower.includes(lowerCaseQuery)
+        );
+    });
+}
+
+// เพิ่ม Debouncing
+let debounceTimeout;
+searchBox.addEventListener('input', () => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+        const query = searchBox.value.trim();
+        const results = searchWords(query);
+        displayWords(results);
+    }, 300);
+});
+
+// แสดงคำศัพท์ทั้งหมดเมื่อโหลดหน้า
+displayWords(preparedDictionary);
     </script>
 </body>
 </html>
