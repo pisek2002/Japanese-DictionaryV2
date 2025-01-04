@@ -73,6 +73,35 @@
             margin-top: 20px;
             color: #555;
         }
+        table {
+        margin-top: 20px;
+        width: 100%;
+        border-collapse: collapse;
+    }
+    table, th, td {
+        border: 1px solid #007BFF; /* กำหนดสีขอบตาราง */
+    }
+    th {
+        background-color: #007BFF; /* พื้นหลังหัวตาราง */
+        color: #ffffff; /* สีข้อความหัวตาราง */
+        padding: 15px;
+    }
+    td {
+        background-color: #e3f2fd; /* พื้นหลังของเซลล์ */
+        color: #333; /* สีข้อความในเซลล์ */
+        padding: 15px;
+        text-align: center;
+        word-wrap: break-word;
+    }
+    tr:nth-child(even) td {
+        background-color: #bbdefb; /* สีพื้นหลังสำหรับแถวคู่ */
+    }
+    tr:nth-child(odd) td {
+        background-color: #e3f2fd; /* สีพื้นหลังสำหรับแถวคี่ */
+    }
+    tr:hover td {
+        background-color: #90caf9; /* สีพื้นหลังเมื่อเลื่อนเมาส์ไปที่แถว */
+    }
     </style>
 </head>
 <body>
